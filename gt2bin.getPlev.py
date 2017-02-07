@@ -6,15 +6,24 @@ import os,sys
 
 model  = "MIROC5"
 prj    = "C20"
+#lexpr  = ["ALL","P15","P20"]
 lexpr  = ["ALL"]
 lens   = [1]
 
 dlYear = {
-          #"ALL":[2006]
-          "ALL":range(2007,2015+1)
+           "ALL":[2006]
+           #"ALL":range(2006,2015+1)
+          ,"P15":range(2106,2115+1)
+          ,"P20":range(2106,2115+1)
          }
 
-lvar   = ["u","v"]
+ldat  = []
+ldat.append(["u500","1dy"])  # c.runmean
+ldat.append(["v500","1dy"])  # c.runmean
+ldat.append(["q850","1dy"])  # ms.FindMinMax
+ldat.append(["q500","1dy"])  # ms.FindMinMax
+ldat.append(["q250","1dy"])  # ms.FindMinMax
+
 
 nx, ny = 256, 128
 lz     = [7]

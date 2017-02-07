@@ -6,27 +6,35 @@ import os,sys
 
 model  = "MIROC5"
 prj    = "C20"
-lexpr  = ["ALL"]
-lens   = [1]
+lexpr  = ["ALL","P15","P20"]
+#lexpr  = ["P15","P20"]
+#lexpr  = ["ALL"]
+
+lens   = [1,2,3]
+#lens   = [2,3,4,5]
 
 dlYear = {
-          "ALL":range(2015,2016+1)
-          #"ALL":range(2008,2016+1)
+           "ALL":range(2006,2015+1)
+          ,"P15":range(2106,2115+1)
+          ,"P20":range(2106,2115+1)
          }
 
-lvar   = ["Ts"]
-#lvar = ["T250","T500","T850","prcp","slp","u250","u850","v250","v850","Ts"]
-#lvar   = ["slp"]
+ldat = []
+##ldat.append([topo","sfc","const"])  # Reads CMIP5 now
+#ldat.append(["slp","6hr"])  # c.findcyclone
+#ldat.append(["u850","6hr"])  # c.findcyclone
+#ldat.append(["v850","6hr"])  # c.findcyclone
+#ldat.append(["sst","mon"])  # tc.mk.tclist
+#ldat.append(["t850","6hr"])  # tc.mk.tclist, f.mk.potloc
+#ldat.append(["t500","6hr"])  # tc.mk.tclist
+#ldat.append(["t250","6hr"])  # tc.mk.tclist
+#ldat.append(["u850","6hr"])  # tc.mk.tclist
+#ldat.append(["u250","6hr"])  # tc.mk.tclist
+#ldat.append(["v850","6hr"])  # tc.mk.tclist
+#ldat.append(["v250","6hr"])  # tc.mk.tclist
+ldat.append(["prcp","mon"])  # ms.mkRegion
 
 nx,ny  = 256, 128
-
-def ret_tstp(var):
-    if var in ["T250","T500","T850","prcp","slp","u250","u850","v250","v850"]:
-        return "6hr"
-    elif var in ["q"]:
-        return "1dy"
-    elif var in ["Ts"]:
-        return "mon"
 
 def ret_nz(tstp):
     if   tstp == "6hr":return 1460
@@ -43,8 +51,7 @@ lkeys = [[expr,ens] for expr in lexpr for ens in lens]
 for expr, ens in lkeys:
     runName = "%s-%s-%03d"%(prj,expr,ens)
     for Year in dlYear[expr]:
-        for var in lvar:
-            tstp = ret_tstp(var)
+        for [var,tstp] in ldat:
             nz   = ret_nz(tstp)
 
             if tstp == "mon":
@@ -58,6 +65,7 @@ for expr, ens in lkeys:
             tmpPath = os.path.join(outDir, "%s.na.%dx%dx%d"%(var,nz,ny,nx))
             outPath = os.path.join(outDir, "%s.sa.%dx%dx%d"%(var,nz,ny,nx))
             util.mk_dir(outDir)
+
             print "Load"
             print srcPath
             print os.path.exists(srcPath) 
