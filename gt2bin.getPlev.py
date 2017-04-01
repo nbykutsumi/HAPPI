@@ -7,56 +7,52 @@ import os,sys
 model  = "MIROC5"
 prj    = "C20"
 #lexpr  = ["ALL","P15","P20"]
-lexpr  = ["ALL"]
-lens   = [1]
+lexpr  = ["P20"]
+lens   = [11,21,31,41]
 
 dlYear = {
-           "ALL":[2006]
-           #"ALL":range(2006,2015+1)
+           "ALL":range(2006,2015+1)
           ,"P15":range(2106,2115+1)
           ,"P20":range(2106,2115+1)
          }
 
 ldat  = []
-ldat.append(["u500","1dy"])  # c.runmean
-ldat.append(["v500","1dy"])  # c.runmean
-ldat.append(["q850","1dy"])  # ms.FindMinMax
-ldat.append(["q500","1dy"])  # ms.FindMinMax
-ldat.append(["q250","1dy"])  # ms.FindMinMax
+ldat.append(["u",500,"1dy"])  # c.runmean
+ldat.append(["v",500,"1dy"])  # c.runmean
+ldat.append(["q",850,"1dy"])  # ms.FindMinMax
+ldat.append(["q",500,"1dy"])  # ms.FindMinMax
+ldat.append(["q",250,"1dy"])  # ms.FindMinMax
 
 
 nx, ny = 256, 128
 lz     = [7]
 #lz     = [3,7,10]
 
-dplev  = {
- 1:  1000.0
-,2:  925.00
-,3:  850.00
-,4:  775.00
-,5:  700.00
-,6:  600.00
-,7:  500.00
-,8:  400.00
-,9:  300.00
-,10: 250.00
-,11: 200.00
-,12: 150.00
-,13: 100.00
-,14: 70.000
-,15: 50.000
-,16: 30.000
-,17: 20.000
-,18: 10.000
+#ibaseDir = "/data2/hjkim/HAPPI"
+ibaseDir = "/data4/common/HAPPI"
+obaseDir = "/home/utsumi/mnt/wellshare/HAPPI/data/%s"%(model)
+
+diz  = {
+  1000:1 
+, 925 :2 
+, 850 :3 
+, 775 :4 
+, 700 :5 
+, 600 :6 
+, 500 :7 
+, 400 :8 
+, 300 :9 
+, 250 :10
+, 200 :11
+, 150 :12
+, 100 :13
+, 70  :14
+, 50  :15
+, 30  :16
+, 20  :17
+, 10  :18
 }
 
-def ret_tstp(var):
-    if var in ["T250","T500","T850","prcp","slp","u250","u850","v250","v850"]:
-        return "6hr"
-    elif var in ["q","u","v"]:
-        return "1dy"
-    elif var in ["Ts"]:
-        return "mon"
 
 def ret_nz(tstp):
     if   tstp == "6hr":return 1460
@@ -66,41 +62,37 @@ def ret_nz(tstp):
         print "check tstp",tstp
         sys.exit()
 
-ibaseDir = "/data2/hjkim/HAPPI"
-obaseDir = "/home/utsumi/mnt/wellshare/HAPPI/data/%s"%(model)
-
 lkeys = [[expr,ens] for expr in lexpr for ens in lens]
 for expr, ens in lkeys:
     runName = "%s-%s-%03d"%(prj,expr,ens)
     for Year in dlYear[expr]:
-        for var in lvar:
-            for iz in lz:
-                tstp = ret_tstp(var)
-                ntime= ret_nz(tstp)
+        for [var,plev,tstp] in ldat:
+            iz   = diz[plev]
+            ntime= ret_nz(tstp)
     
-                if tstp == "mon":
-                    srcDir = os.path.join(ibaseDir,runName,"y%04d"%Year)
-                else:
-                    srcDir = os.path.join(ibaseDir,runName,"y%04d"%Year,tstp)
+            if tstp == "mon":
+                srcDir = os.path.join(ibaseDir,runName,"y%04d"%Year)
+            else:
+                srcDir = os.path.join(ibaseDir,runName,"y%04d"%Year,tstp)
            
-                srcPath = os.path.join(srcDir,var)
+            srcPath = os.path.join(srcDir,var)
     
-                outDir  = os.path.join(obaseDir,runName,"y%04d"%Year,tstp)
-                tmpPath = os.path.join(outDir, "%s%d.na.%dx%dx%d"%(var,int(dplev[iz]),ntime,ny,nx))
-                outPath = os.path.join(outDir, "%s%d.sa.%dx%dx%d"%(var,int(dplev[iz]),ntime,ny,nx))
-                util.mk_dir(outDir)
-                print "Load"
-                print srcPath
-                print os.path.exists(srcPath) 
-                cmd = "ngtconv -z %d -f raw_float_little %s %s"%(iz, srcPath, tmpPath)
-                subprocess.call(cmd.split(" "))
+            outDir  = os.path.join(obaseDir,runName,"y%04d"%Year,tstp)
+            tmpPath = os.path.join(outDir, "%s%d.na.%dx%dx%d"%(var,plev,ntime,ny,nx))
+            outPath = os.path.join(outDir, "%s%d.sa.%dx%dx%d"%(var,plev,ntime,ny,nx))
+            util.mk_dir(outDir)
+            print "Load"
+            print srcPath
+            print os.path.exists(srcPath) 
+            cmd = "ngtconv -z %d -f raw_float_little %s %s"%(iz, srcPath, tmpPath)
+            subprocess.call(cmd.split(" "))
     
-                # Flip
-                aIn = fromfile(tmpPath, float32).reshape(ntime,ny,nx)
-                aIn[:,::-1,:].tofile(outPath)
-                print "Write"
-                os.remove(tmpPath)
-                print "Write"
-                print outPath
+            # Flip
+            aIn = fromfile(tmpPath, float32).reshape(ntime,ny,nx)
+            aIn[:,::-1,:].tofile(outPath)
+            print "Write"
+            os.remove(tmpPath)
+            print "Write"
+            print outPath
     
     

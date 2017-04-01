@@ -6,12 +6,11 @@ import os,sys
 
 model  = "MIROC5"
 prj    = "C20"
-lexpr  = ["ALL","P15","P20"]
+#lexpr  = ["ALL","P15","P20"]
 #lexpr  = ["P15","P20"]
-#lexpr  = ["ALL"]
+lexpr  = ["P20"]
 
-lens   = [1,2,3]
-#lens   = [2,3,4,5]
+lens   = [11,21,31,41]
 
 dlYear = {
            "ALL":range(2006,2015+1)
@@ -20,19 +19,20 @@ dlYear = {
          }
 
 ldat = []
-##ldat.append([topo","sfc","const"])  # Reads CMIP5 now
-#ldat.append(["slp","6hr"])  # c.findcyclone
-#ldat.append(["u850","6hr"])  # c.findcyclone
-#ldat.append(["v850","6hr"])  # c.findcyclone
-#ldat.append(["sst","mon"])  # tc.mk.tclist
-#ldat.append(["t850","6hr"])  # tc.mk.tclist, f.mk.potloc
-#ldat.append(["t500","6hr"])  # tc.mk.tclist
-#ldat.append(["t250","6hr"])  # tc.mk.tclist
-#ldat.append(["u850","6hr"])  # tc.mk.tclist
-#ldat.append(["u250","6hr"])  # tc.mk.tclist
-#ldat.append(["v850","6hr"])  # tc.mk.tclist
-#ldat.append(["v250","6hr"])  # tc.mk.tclist
+#ldat.append([topo","sfc","const"])  # Reads CMIP5 now
+ldat.append(["slp","6hr"])  # c.findcyclone
+ldat.append(["u850","6hr"])  # c.findcyclone
+ldat.append(["v850","6hr"])  # c.findcyclone
+ldat.append(["Ts","mon"])  # tc.mk.tclist
+ldat.append(["T850","6hr"])  # tc.mk.tclist, f.mk.potloc
+ldat.append(["T500","6hr"])  # tc.mk.tclist
+ldat.append(["T250","6hr"])  # tc.mk.tclist
+ldat.append(["u850","6hr"])  # tc.mk.tclist
+ldat.append(["u250","6hr"])  # tc.mk.tclist
+ldat.append(["v850","6hr"])  # tc.mk.tclist
+ldat.append(["v250","6hr"])  # tc.mk.tclist
 ldat.append(["prcp","mon"])  # ms.mkRegion
+ldat.append(["prcp","6hr"])  # ms.mkRegion
 
 nx,ny  = 256, 128
 
@@ -44,7 +44,8 @@ def ret_nz(tstp):
         print "check tstp",tstp
         sys.exit()
 
-ibaseDir = "/data2/hjkim/HAPPI"
+#ibaseDir = "/data2/hjkim/HAPPI"
+ibaseDir = "/data4/common/HAPPI"
 obaseDir = "/home/utsumi/mnt/wellshare/HAPPI/data/%s"%(model)
 
 lkeys = [[expr,ens] for expr in lexpr for ens in lens]
